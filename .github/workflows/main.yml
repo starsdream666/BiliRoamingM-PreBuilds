@@ -52,7 +52,7 @@ jobs:
         with:
           repository: "zjns/revanced-cli"
           latest: true
-          fileName: "revanced-cli.jar"  
+          fileName: "revanced-cli.jar"    
 
       - name: Get Bilibili-Play
         run: |
