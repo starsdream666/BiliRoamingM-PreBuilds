@@ -37,7 +37,7 @@ jobs:
           mv *-integrations-*.apk integrations.apk
           mv *-patches-*.jar patches.jar
 
-      - name: Export BiliM LATEST_TAG
+      - name: Export BiliM Latest Tag
         run: |
           tag=$(curl -L \
             -H "Accept: application/vnd.github+json" \
@@ -75,14 +75,12 @@ jobs:
         run: |
           java -jar revanced-cli.jar patch --merge integrations.apk --patch-bundle patches.jar --signing-levels 1,2,3 play.apk
 
-      # named Bilix-play
-      - name: Rename Bilix-play
+      - name: Rename BiliM-play
         run: |
           mv play-patched.apk BiliM-play-${Bili_PLAY_VER}-${BiliM_LATEST_TAG}.apk
           echo "BiliM_PLAY_PATCHED_PATH=BiliM-play-${{ env.Bili_PLAY_VER }}-${{ env.BiliM_LATEST_TAG }}.apk"  >> $GITHUB_ENV
 
-      # Signing Bilix-play
-      - name: Resign Bilix-play
+      - name: Resign BiliM-play
         run: |
           cd ./
           echo Downloading uber-apk-signer
@@ -112,6 +110,5 @@ jobs:
 
       - name: Upload Files to Telegram
         run: |
-          echo "TG_BOT_TOKEN=${{ secrets.TG_BOT_TOKEN }}" >> $GITHUB_ENV
           pip install pyrogram tgcrypto
-          python telegram-upload.py
+          python telegram-upload.py ${{ secrets.TG_BOT_TOKEN }}

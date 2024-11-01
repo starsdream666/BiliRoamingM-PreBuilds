@@ -1,14 +1,15 @@
 import asyncio
 import os
+import sys
 
 from pyrogram import Client
 from pyrogram.types import InputMediaDocument
 
 
 async def main():
+    bot_token = sys.argv[1]
     api_id = 611335
     api_hash = "d524b414d21f4d37f08684c1df41ac9c"
-    bot_token = os.environ["TG_BOT_TOKEN"]
     bot = Client("client", api_id=api_id, api_hash=api_hash, bot_token=bot_token)
     async with bot:
         roaming_ver = os.environ["BiliM_LATEST_TAG"]
