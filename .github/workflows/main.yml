@@ -37,7 +37,7 @@ jobs:
           mv *-integrations-*.apk integrations.apk
           mv *-patches-*.jar patches.jar
 
-      - name: Export BiliM Latest Tag
+      - name: Export BiliM Latest Tag  
         run: |
           tag=$(curl -L \
             -H "Accept: application/vnd.github+json" \
@@ -78,30 +78,18 @@ jobs:
       - name: Rename BiliM-play
         run: |
           mv play-patched.apk BiliM-play-${Bili_PLAY_VER}-${BiliM_LATEST_TAG}.apk
-          echo "BiliM_PLAY_PATCHED_PATH=BiliM-play-${{ env.Bili_PLAY_VER }}-${{ env.BiliM_LATEST_TAG }}.apk"  >> $GITHUB_ENV
-
-      - name: Resign BiliM-play
-        run: |
-          cd ./
-          echo Downloading uber-apk-signer
-          wget https://github.com/patrickfav/uber-apk-signer/releases/download/v1.3.0/uber-apk-signer-1.3.0.jar
-          echo ${{ secrets.SIGNING_KEY }} > bilim.base64
-          base64 -d bilim.base64 > bilim.jks
-          java -jar uber-apk-signer-1.3.0.jar \
-            -a ${{ env.BiliM_PLAY_PATCHED_PATH }} --overwrite --allowResign \
-            --ks bilim.jks --ksAlias bili --ksKeyPass bilibili --ksPass bilibili  
+          echo "BiliM_PLAY_PATCHED_PATH=BiliM-play-${{ env.Bili_PLAY_VER }}-${{ env.BiliM_LATEST_TAG }}.apk"  >> $GITHUB_ENV  
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: bilim-${{ env.Bili_PLAY_VER }}-${{ env.BiliM_LATEST_TAG }}
+          name: bilim-${{ env.Bili_PLAY_VER }}-${{ env.BiliM_LATEST_TAG }}  
           path: ${{ env.BiliM_PLAY_PATCHED_PATH }}
 
       - name: Release
         uses: softprops/action-gh-release@v2
         if: inputs.release == 'yes'
         with:
-          # draft: true
           name: BiliM-play-${{ env.Bili_PLAY_VER }}-${{ env.BiliM_LATEST_TAG }}
           tag_name: v${{ env.Bili_PLAY_VER }}-${{ env.BiliM_LATEST_TAG }}
           body: v${{ env.Bili_PLAY_VER }}-${{ env.BiliM_LATEST_TAG }}
