@@ -16,7 +16,7 @@ async def main():
         bili_ver = os.environ["Bili_PLAY_VER"]
         msg_p1 = "<b>BiliM-Release</b>"
         msg_p2 = "New release to GitHub!"
-        msg_p3 = f"<pre>v{bili_ver}-{roaming_ver}<br>BiliRoamingM {roaming_ver}</pre>"
+        msg_p3 = f"<pre>Bilibili-Play: v{bili_ver}\nBiliRoamingM: v{roaming_ver}</pre>"
         msg_p4 = f'<a href="https://github.com/sakarie9/BiliRoamingM-PreBuilds/releases/tag/v{bili_ver}-{roaming_ver}">Github Releases</a>'
         caption = "{}\n{}\n{}\n\n{}".format(msg_p1, msg_p2, msg_p3, msg_p4)
 
