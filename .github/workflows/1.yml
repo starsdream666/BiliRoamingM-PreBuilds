@@ -56,8 +56,8 @@ jobs:
 
       - name: Get Bilibili-Play
         run: |
-          UA="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.159 Safari/537.36"
-          wget -q --user-agent="$UA" "https://dl.hdslb.com/mobile/latest/android64/iBiliPlayer-bili.apk?t=20241101&spm_id_from=333.47.b_646f776e6c6f61642d6c696e6b.1"                        
+          UA="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.159 Safari/537.36"    
+          wget -q --user-agent="$UA" "https://dl.hdslb.com/mobile/latest/android64/iBiliPlayer-bili.apk?t=20241101&spm_id_from=333.47.b_646f776e6c6f61642d6c696e6b.1"                              
 
       # Check $version & $versionCode
       - name: "Get play Info"
@@ -68,7 +68,7 @@ jobs:
       # Get play $patchVersion $patchVersionCode
       - name: Get Bilibili-Play Info
         run: |
-          echo "Bili_PLAY_VER=${{steps.apk-info-play.outputs.versionNum}}" >> $GITHUB_ENV  
+          echo "Bili_PLAY_VER=${{steps.apk-info-play.outputs.versionNum}}" >> $GITHUB_ENV
           echo "Bili_PLAY_VERCODE=${{steps.apk-info-play.outputs.versionCode}}" >> $GITHUB_ENV
 
       - name: Build BiliM-play
@@ -77,28 +77,28 @@ jobs:
 
       - name: Rename BiliM-play
         run: |
-          mv play-patched.apk BiliM-play-${{ env.Bili_PLAY_VER }}-${{ env.BiliM_LATEST_TAG }}.apk
-          echo "BiliM_PLAY_PATCHED_PATH=BiliM-play-${{ env.Bili_PLAY_VER }}-${{ env.BiliM_LATEST_TAG }}.apk"  >> $GITHUB_ENV  
+          mv play-patched.apk BiliM-play-${{ env.Bili_PLAY_VER }}-${{ env.BiliM_LATEST_TAG }}.apk  
+          echo "BiliM_PLAY_PATCHED_PATH=BiliM-play-${{ env.Bili_PLAY_VER }}-${{ env.BiliM_LATEST_TAG }}.apk"  >> $GITHUB_ENV    
 
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4  
+        uses: actions/upload-artifact@v4
         with:
-          name: bilim-${{ env.Bili_PLAY_VER }}-${{ env.BiliM_LATEST_TAG }}          
-          path: /home/runner/work/BiliRoamingM-PreBuilds/BiliRoamingM-PreBuilds/bilim-${{ env.Bili_PLAY_VER }}-${{ env.BiliM_LATEST_TAG }}
+          name: bilim-${{ env.Bili_PLAY_VER }}-${{ env.BiliM_LATEST_TAG }}    
+          path: /home/runner/work/BiliRoamingM-PreBuilds/BiliRoamingM-PreBuilds/bilim-${{ env.Bili_PLAY_VER }}-${{ env.BiliM_LATEST_TAG }} 
 
       - name: Release
-        uses: softprops/action-gh-release@v2  
+        uses: softprops/action-gh-release@v2
         if: inputs.release == 'yes'
         with:
           # draft: true
-          name: BiliM-play-${{ env.Bili_PLAY_VER }}-${{ env.BiliM_LATEST_TAG }}    
-          tag_name: v${{ env.Bili_PLAY_VER }}-${{ env.BiliM_LATEST_TAG }}
-          body: v${{ env.Bili_PLAY_VER }}-${{ env.BiliM_LATEST_TAG }}  
-          fail_on_unmatched_files: true
+          name: BiliM-play-${{ env.Bili_PLAY_VER }}-${{ env.BiliM_LATEST_TAG }}
+          tag_name: v${{ env.Bili_PLAY_VER }}-${{ env.BiliM_LATEST_TAG }}  
+          body: v${{ env.Bili_PLAY_VER }}-${{ env.BiliM_LATEST_TAG }}
+          fail_on_unmatched_files: true  
           files: |
-            ${{ env.BiliM_PLAY_PATCHED_PATH }}  
+            ${{ env.BiliM_PLAY_PATCHED_PATH }}
 
       - name: Upload Files to Telegram
         run: |
-          pip install pyrogram tgcrypto  
+          pip install pyrogram tgcrypto
           python telegram-upload.py ${{ secrets.TG_BOT_TOKEN }}
