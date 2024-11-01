@@ -112,5 +112,6 @@ jobs:
 
       - name: Upload Files to Telegram
         run: |
+          echo "TG_BOT_TOKEN=${{ secrets.TG_BOT_TOKEN }}" >> $GITHUB_ENV
           pip install pyrogram tgcrypto
           python telegram-upload.py
