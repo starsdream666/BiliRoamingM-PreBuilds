@@ -56,7 +56,7 @@ jobs:
 
       - name: Get Bilibili-Play
         run: |
-          UA="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.159 Safari/537.36"  
+          UA="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.159 Safari/537.36"
           wget -q --user-agent="$UA" -O "play.apk" "https://d.apkpure.com/b/APK/com.bilibili.app.in?version=latest"
 
       # Check $version & $versionCode
@@ -77,22 +77,23 @@ jobs:
 
       - name: Rename BiliM-play
         run: |
-          mv play-patched.apk BiliM-play-8.18.0-1.23.3.3.apk
-          echo "BiliM_PLAY_PATCHED_PATH=BiliM-play-8.18.0-1.23.3.3.apk" >> $GITHUB_ENV  
+          mv play-patched.apk BiliM-play-${{ env.Bili_PLAY_VER }}-${{ env.BiliM_LATEST_TAG }}.apk
+          echo "BiliM_PLAY_PATCHED_PATH=BiliM-play-${{ env.Bili_PLAY_VER }}-${{ env.BiliM_LATEST_TAG }}.apk"  >> $GITHUB_ENV  
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: bilim-8.18.0-1.23.3.3  
+          name: bilim-${{ env.Bili_PLAY_VER }}-${{ env.BiliM_LATEST_TAG }}  
           path: ${{ env.BiliM_PLAY_PATCHED_PATH }}
 
       - name: Release
         uses: softprops/action-gh-release@v2
         if: inputs.release == 'yes'
         with:
-          name: BiliM-play-8.18.0-1.23.3.3
-          tag_name: v8.18.0-1.23.3.3
-          body: v8.18.0-1.23.3.3
+          # draft: true
+          name: BiliM-play-${{ env.Bili_PLAY_VER }}-${{ env.BiliM_LATEST_TAG }}
+          tag_name: v${{ env.Bili_PLAY_VER }}-${{ env.BiliM_LATEST_TAG }}
+          body: v${{ env.Bili_PLAY_VER }}-${{ env.BiliM_LATEST_TAG }}
           fail_on_unmatched_files: true
           files: |
             ${{ env.BiliM_PLAY_PATCHED_PATH }}
