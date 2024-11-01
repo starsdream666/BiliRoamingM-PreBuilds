@@ -105,15 +105,16 @@ jobs:
           files: |
             ${{ env.BiliM_play_patched_path }}
 
-      - name: Upload files to Telegram
-        uses: xz-dev/TelegramFileUploader@v1.1.1
+      - name: Upload Files to Telegram
+        uses: appleboy/telegram-action@master
         if: inputs.release == 'yes'
         with:
-          to-who: ${{ secrets.TG_CHAT_ID }}
-          message: "v${{ env.Bili_play_ver }}-${{ env.BiliM_LATEST_TAG }}\n[Github Releases](https://github.com/sakarie9/BiliRoamingM-PreBuilds/releases/tag/v${{ env.Bili_play_ver }}-${{ env.BiliM_LATEST_TAG }})"
-          files: |
-            ${{ env.BiliM_play_patched_path }}
-        env:
-          API_ID: 611335
-          API_HASH: d524b414d21f4d37f08684c1df41ac9c
-          BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+          to: ${{ secrets.TG_CHAT_ID }}
+          token: ${{ secrets.TG_BOT_TOKEN }}
+          format: markdown
+          message: |
+            v${{ env.Bili_play_ver }}-${{ env.BiliM_LATEST_TAG }}
+
+            [Github Releases](https://github.com/${{ github.repository }}/releases/tag/v${{ env.Bili_play_ver }}-${{ env.BiliM_LATEST_TAG }})
+          document: ${{ env.BiliM_play_patched_path }}
+          disable_web_page_preview: true
