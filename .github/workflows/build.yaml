@@ -20,6 +20,11 @@ jobs:
           java-version: "21"
           java-package: "jre"
 
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.9.x"
+
       - name: Get BiliM Releases
         uses: robinraju/release-downloader@v1.11
         with:
@@ -63,8 +68,8 @@ jobs:
       # Get play $patchVersion $patchVersionCode
       - name: Get Bilibili-Play Info
         run: |
-          echo "Bili_play_ver=${{steps.apk-info-play.outputs.versionNum}}" >> $GITHUB_ENV
-          echo "Bili_play_vercode=${{steps.apk-info-play.outputs.versionCode}}" >> $GITHUB_ENV
+          echo "Bili_PLAY_VER=${{steps.apk-info-play.outputs.versionNum}}" >> $GITHUB_ENV
+          echo "Bili_PLAY_VERCODE=${{steps.apk-info-play.outputs.versionCode}}" >> $GITHUB_ENV
 
       - name: Build BiliM-play
         run: |
@@ -73,8 +78,8 @@ jobs:
       # named Bilix-play
       - name: Rename Bilix-play
         run: |
-          mv play-patched.apk BiliM-play-${Bili_play_ver}-${BiliM_LATEST_TAG}.apk
-          echo "BiliM_play_patched_path=BiliM-play-${{ env.Bili_play_ver }}-${{ env.BiliM_LATEST_TAG }}.apk"  >> $GITHUB_ENV
+          mv play-patched.apk BiliM-play-${Bili_PLAY_VER}-${BiliM_LATEST_TAG}.apk
+          echo "BiliM_PLAY_PATCHED_PATH=BiliM-play-${{ env.Bili_PLAY_VER }}-${{ env.BiliM_LATEST_TAG }}.apk"  >> $GITHUB_ENV
 
       # Signing Bilix-play
       - name: Resign Bilix-play
@@ -85,36 +90,27 @@ jobs:
           echo ${{ secrets.SIGNING_KEY }} > bilim.base64
           base64 -d bilim.base64 > bilim.jks
           java -jar uber-apk-signer-1.3.0.jar \
-            -a ${{ env.BiliM_play_patched_path }} --overwrite --allowResign \
+            -a ${{ env.BiliM_PLAY_PATCHED_PATH }} --overwrite --allowResign \
             --ks bilim.jks --ksAlias bili --ksKeyPass bilibili --ksPass bilibili
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: bilim-${{ env.Bili_play_ver }}-${{ env.BiliM_LATEST_TAG }}
-          path: ${{ env.BiliM_play_patched_path }}
+          name: bilim-${{ env.Bili_PLAY_VER }}-${{ env.BiliM_LATEST_TAG }}
+          path: ${{ env.BiliM_PLAY_PATCHED_PATH }}
 
       - name: Release
         uses: softprops/action-gh-release@v2
         if: inputs.release == 'yes'
         with:
           draft: true
-          name: BiliM-play-${{ env.Bili_play_ver }}-${{ env.BiliM_LATEST_TAG }}
-          body: v${{ env.Bili_play_ver }}-${{ env.BiliM_LATEST_TAG }}
+          name: BiliM-play-${{ env.Bili_PLAY_VER }}-${{ env.BiliM_LATEST_TAG }}
+          body: v${{ env.Bili_PLAY_VER }}-${{ env.BiliM_LATEST_TAG }}
           fail_on_unmatched_files: true
           files: |
-            ${{ env.BiliM_play_patched_path }}
+            ${{ env.BiliM_PLAY_PATCHED_PATH }}
 
       - name: Upload Files to Telegram
-        uses: appleboy/telegram-action@master
-        if: inputs.release == 'yes'
-        with:
-          to: ${{ secrets.TG_CHAT_ID }}
-          token: ${{ secrets.TG_BOT_TOKEN }}
-          format: markdown
-          message: |
-            v${{ env.Bili_play_ver }}-${{ env.BiliM_LATEST_TAG }}
-
-            [Github Releases](https://github.com/${{ github.repository }}/releases/tag/v${{ env.Bili_play_ver }}-${{ env.BiliM_LATEST_TAG }})
-          document: ${{ env.BiliM_play_patched_path }}
-          disable_web_page_preview: true
+        run: |
+          pip install pyrogram tgcrypto
+          python telegram-action.py
