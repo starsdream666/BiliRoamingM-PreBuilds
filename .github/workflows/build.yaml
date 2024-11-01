@@ -101,8 +101,9 @@ jobs:
         uses: softprops/action-gh-release@v2
         if: inputs.release == 'yes'
         with:
-          draft: true
+          # draft: true
           name: BiliM-play-${{ env.Bili_PLAY_VER }}-${{ env.BiliM_LATEST_TAG }}
+          tag_name: v${{ env.Bili_PLAY_VER }}-${{ env.BiliM_LATEST_TAG }}
           body: v${{ env.Bili_PLAY_VER }}-${{ env.BiliM_LATEST_TAG }}
           fail_on_unmatched_files: true
           files: |
