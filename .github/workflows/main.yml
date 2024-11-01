@@ -1,0 +1,103 @@
+name: Build BiliM
+
+on:
+  workflow_dispatch:
+    inputs:
+      release:
+        description: "yes to release"
+        required: false
+
+jobs:
+  Build-BiliM:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup JRE
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin" # See 'Supported distributions' for available options
+          java-version: "21"
+          java-package: "jre"
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.9.x"
+
+      - name: Get BiliM Releases
+        uses: robinraju/release-downloader@v1.11
+        with:
+          repository: "sakarie9/BiliRoamingM"
+          latest: true
+          fileName: "BiliRoamingM-*"
+
+      - name: Rename BiliM
+        run: |
+          mv *-integrations-*.apk integrations.apk
+          mv *-patches-*.jar patches.jar
+
+      - name: Export BiliM Latest Tag  
+        run: |
+          tag=$(curl -L \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/sakarie9/BiliRoamingM/releases/latest" \
+            | jq -r .tag_name)
+          echo "BiliM_LATEST_TAG=${tag#v}" >> $GITHUB_ENV
+
+      - name: Get Revanced CLI
+        uses: robinraju/release-downloader@v1.11
+        with:
+          repository: "zjns/revanced-cli"
+          latest: true
+          fileName: "revanced-cli.jar"
+
+      - name: Get Bilibili-Play
+        run: |
+          UA="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.159 Safari/537.36"  
+          wget -q --user-agent="$UA" -O "play.apk" "https://d.apkpure.com/b/APK/com.bilibili.app.in?version=latest"
+
+      # Check $version & $versionCode
+      - name: "Get play Info"
+        id: "apk-info-play"
+        uses: "8Mi-Tech/get-apk-info-action@master"
+        with:
+          apkPath: "play.apk"
+      # Get play $patchVersion $patchVersionCode
+      - name: Get Bilibili-Play Info
+        run: |
+          echo "Bili_PLAY_VER=${{steps.apk-info-play.outputs.versionNum}}" >> $GITHUB_ENV
+          echo "Bili_PLAY_VERCODE=${{steps.apk-info-play.outputs.versionCode}}" >> $GITHUB_ENV
+
+      - name: Build BiliM-play
+        run: |
+          java -jar revanced-cli.jar patch --merge integrations.apk --patch-bundle patches.jar --signing-levels 1,2,3 play.apk
+
+      - name: Rename BiliM-play
+        run: |
+          mv play-patched.apk BiliM-play-8.18.0-1.23.3.3.apk
+          echo "BiliM_PLAY_PATCHED_PATH=BiliM-play-8.18.0-1.23.3.3.apk" >> $GITHUB_ENV  
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: bilim-8.18.0-1.23.3.3  
+          path: ${{ env.BiliM_PLAY_PATCHED_PATH }}
+
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        if: inputs.release == 'yes'
+        with:
+          name: BiliM-play-8.18.0-1.23.3.3
+          tag_name: v8.18.0-1.23.3.3
+          body: v8.18.0-1.23.3.3
+          fail_on_unmatched_files: true
+          files: |
+            ${{ env.BiliM_PLAY_PATCHED_PATH }}
+
+      - name: Upload Files to Telegram
+        run: |
+          pip install pyrogram tgcrypto
+          python telegram-upload.py ${{ secrets.TG_BOT_TOKEN }}
