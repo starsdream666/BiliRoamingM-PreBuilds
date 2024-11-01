@@ -91,7 +91,7 @@ jobs:
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: bilim-${Bili_play_ver}-${BiliM_LATEST_TAG}
+          name: bilim-${{ env.Bili_play_ver }}-${{ env.BiliM_LATEST_TAG }}
           path: ${{ env.BiliM_play_patched_path }}
 
       - name: Release
@@ -100,7 +100,7 @@ jobs:
         with:
           draft: true
           name: BiliM-play-${{ env.Bili_play_ver }}-${{ env.BiliM_LATEST_TAG }}
-          body: v${Bili_play_ver}-${BiliM_LATEST_TAG}
+          body: v${{ env.Bili_play_ver }}-${{ env.BiliM_LATEST_TAG }}
           fail_on_unmatched_files: true
           files: |
             ${{ env.BiliM_play_patched_path }}
@@ -110,7 +110,7 @@ jobs:
         if: inputs.release == 'yes'
         with:
           to-who: ${{ secrets.TG_CHAT_ID }}
-          message: "v${Bili_play_ver}-${BiliM_LATEST_TAG}\n[Github Releases](https://github.com/sakarie9/BiliRoamingM-PreBuilds/releases/tag/v${Bili_play_ver}-${BiliM_LATEST_TAG})"
+          message: "v${{ env.Bili_play_ver }}-${{ env.BiliM_LATEST_TAG }}\n[Github Releases](https://github.com/sakarie9/BiliRoamingM-PreBuilds/releases/tag/v${{ env.Bili_play_ver }}-${{ env.BiliM_LATEST_TAG }})"
           files: |
             ${{ env.BiliM_play_patched_path }}
         env:
