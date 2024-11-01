@@ -57,7 +57,7 @@ jobs:
       - name: Get Bilibili-Play
         run: |
           UA="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.159 Safari/537.36"
-          wget -q --user-agent="$UA" -O "play.apk" "https://d.apkpure.com/b/APK/com.bilibili.app.in?version=latest"
+          wget -q --user-agent="$UA" -O "play.apk" "https://dl.hdslb.com/mobile/latest/android64/iBiliPlayer-bili.apk?t=20241101&spm_id_from=333.47.b_646f776e6c6f61642d6c696e6b.1"  
 
       # Check $version & $versionCode
       - name: "Get play Info"
